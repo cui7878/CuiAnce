@@ -1,7 +1,6 @@
-# GlobalMedia-Clean for xolny SR conf (based on blackmatrix7 GlobalMedia, snapshot 2026-11-06)
-# Removed 12 lines whose DOMAIN-KEYWORD / USER-AGENT entries hijack IP-sensitive lanes in Shadowrocket's matcher:
-# youtube (suffix+keyword+7 USER-AGENT) -> must use YouTube lane (residential); claude/anthropic keywords -> AI lane (residential); tiktokcdn keyword -> TikTok lane (residential).
-# Trade-off: no auto-update from upstream; re-snapshot manually when needed.
+# GlobalMedia-Clean for xolny SR conf (based on blackmatrix7 GlobalMedia; auto-synced from upstream by sync_clean_lists.py)
+# Removed lines: DOMAIN-SUFFIX,youtube; DOMAIN-KEYWORD,youtube / claude / anthropic / tiktokcdn; every USER-AGENT line mentioning youtube.
+# Those lines hijack IP-sensitive lanes (YouTube / AI / TikTok must exit via the residential IP); each service keeps its full rule set in its own list.
 # NAME: GlobalMedia
 # AUTHOR: blackmatrix7
 # REPO: https://github.com/blackmatrix7/ios_rule_script

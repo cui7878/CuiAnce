@@ -1,6 +1,5 @@
-# Proxy-Clean for xolny SR conf (based on blackmatrix7 Proxy, snapshot 2026-11-06)
-# Removed 2 lines: DOMAIN-KEYWORD,youtube (hijacked YouTube to the non-China lane / Catpro; YouTube must use its own lane, residential) and DOMAIN-KEYWORD,1e100 (Google infrastructure; all Google traffic must use the residential lane).
-# Trade-off: no auto-update from upstream; re-snapshot manually when needed.
+# Proxy-Clean for xolny SR conf (based on blackmatrix7 Proxy; auto-synced from upstream by sync_clean_lists.py)
+# Removed lines: DOMAIN-KEYWORD,youtube (YouTube has its own residential lane) and DOMAIN-KEYWORD,1e100 (Google infrastructure; all Google traffic uses the residential lane).
 # NAME: Proxy
 # AUTHOR: blackmatrix7
 # REPO: https://github.com/blackmatrix7/ios_rule_script
