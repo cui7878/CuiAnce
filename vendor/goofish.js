@@ -1,5 +1,8 @@
 // Vendored 2026-11-06 from https://raw.githubusercontent.com/ishowshu/qx/refs/heads/main/script/goofish.js
-// Audited line-by-line before hosting; unmodified logic.
+// Audited line-by-line before hosting. 2026-11-16 v2 modifications by Muse (marked inline):
+// nextfresh/local.home keep-only filter widened to data.bizType === "item" with fail-open,
+// search filter also drops clickParam.args.biz_type !== "item", new handlers for
+// idle.item.recommend (mamaAD cards) and idle.item.buy.feeds (delete sections).
 //  2026-10-24
 //  树先生
 //  当前文件内容仅供个人学习和研究使用，若使用过程中发生任何问题概不负责
@@ -24,9 +27,18 @@ if (url.includes("/gw/mtop.taobao.idlehome.home.nextfresh")) {
       return !excludeNames.includes(section.template.name);  
     });
     
-    obj.data.sections = obj.data.sections.filter(section => {
-      return (section.data && (section.data.cardTypeValue === "Item"));
+    // 只保留商品卡：新版标记 data.bizType === "item"，旧版 data.cardTypeValue === "Item"；
+    // 两种标记都找不到时 fail-open 原样保留，避免接口改版把信息流清空（2026-11-16 v2 改）。
+    const hasItemMarkerNextfresh = obj.data.sections.some(section => {
+      const d = (section && section.data) || {};
+      return d.bizType === "item" || d.cardTypeValue === "Item";
     });
+    if (hasItemMarkerNextfresh) {
+      obj.data.sections = obj.data.sections.filter(section => {
+        const d = (section && section.data) || {};
+        return d.bizType === "item" || d.cardTypeValue === "Item";
+      });
+    }
   }
   // 首页新的顶部图标菜单
   obj.data.homeTopList = [];
@@ -37,6 +49,17 @@ if (url.includes("/gw/mtop.taobao.idle.local.home")) {
     obj.data.sections = obj.data.sections.filter(section => {
       return !(section.data && section.data.bizType === "AD");
     });
+    // 同 nextfresh：有商品标记时只留商品卡，无标记 fail-open（2026-11-16 v2 改）。
+    const hasItemMarkerLocal = obj.data.sections.some(section => {
+      const d = (section && section.data) || {};
+      return d.bizType === "item" || d.cardTypeValue === "Item";
+    });
+    if (hasItemMarkerLocal) {
+      obj.data.sections = obj.data.sections.filter(section => {
+        const d = (section && section.data) || {};
+        return d.bizType === "item" || d.cardTypeValue === "Item";
+      });
+    }
   }
 }
 
@@ -127,12 +150,16 @@ if (url.includes("/gw/mtop.taobao.idlemtopsearch.search")) {
       // 使用filter方法遍历resultList数组，并过滤掉不符合条件的元素  
       obj.data.resultList = obj.data.resultList.filter(element => {  
           // 检查当前元素是否包含所需的嵌套属性  
-          if (element.data && element.data.item && element.data.item.main && element.data.item.main.exContent) {  
-              // 检查isAliMaMaAD的值  
-              const isAliMaMaAD = element.data.item.main.exContent.isAliMaMaAD;  
-              // 如果isAliMaMaAD是true或"true"，则返回false以过滤掉这个元素  
-              return !(isAliMaMaAD === true || isAliMaMaAD === "true");  
-          }  
+          if (element.data && element.data.item && element.data.item.main && element.data.item.main.exContent) {
+              // 检查isAliMaMaAD的值
+              const isAliMaMaAD = element.data.item.main.exContent.isAliMaMaAD;
+              // 如果isAliMaMaAD是true或"true"，则返回false以过滤掉这个元素
+              if (isAliMaMaAD === true || isAliMaMaAD === "true") return false;
+              // 新版标记：clickParam.args.biz_type 存在且不是 "item" 的是广告/运营卡（2026-11-16 v2 增）
+              const gfArgs = element.data.item.main.clickParam && element.data.item.main.clickParam.args;
+              if (gfArgs && gfArgs.biz_type && gfArgs.biz_type !== "item") return false;
+              return true;
+          }
           // 如果没有所需的嵌套属性，也可以返回true来保留这个元素（如果你希望的话）  
           // 或者你可以选择返回false来过滤掉没有这些属性的元素  
           // 这里我们假设没有这些属性的元素应该被保留  
@@ -227,6 +254,19 @@ if (url.includes("/mtop.taobao.idle.local.flow.plat.section")) {
   obj.data.data.components = obj.data.data.components.filter(item => !keyArr.includes(item.key));
 }
 
-  
+
+// ===== 2026-11-16 v2 新增：商品页上滑推荐流 + 购买流广告（标记口径与社区现行 JQ 规则一致，逐条核过） =====
+if (url.includes("/gw/mtop.taobao.idle.item.recommend/")) {
+  // 详情页下方推荐流：只删阿里妈妈广告卡（cardData.bizType === "mamaAD"），正常推荐保留
+  if (obj.data && Array.isArray(obj.data.cardList)) {
+    obj.data.cardList = obj.data.cardList.filter(card => !(card && card.cardData && card.cardData.bizType === "mamaAD"));
+  }
+}
+
+if (url.includes("/gw/mtop.taobao.idle.item.buy.feeds")) {
+  // 购买流广告坑位：整段删除 sections
+  if (obj.data) delete obj.data.sections;
+}
+
 body = JSON.stringify(obj);
 $done({body});
