@@ -1,6 +1,13 @@
-#!name=国内常用 App 去广告 v3 · Xolny 定制
-#!desc=v3（2026-11-16）：在 v2 全部内容之上，新增哔哩哔哩开屏+首页信息流广告过滤（自有脚本，源自 app2smile 已审读逻辑，fail-open）；闲鱼脚本升级 v2（信息流新版 bizType 标记+fail-open、商品页 mamaAD 推荐广告、购买流广告、广告曝光接口拦截，脚本匹配范围扩到脚本已实现的全部接口）；另补高德开屏、网易云音乐活动弹窗、夸克广告路径。脚本全部托管于自有 GitHub 且逐个审读过。MITM 仅限下列娱乐/内容类主机，不含微信、支付宝、银行及支付域名。导入前请先删除 v2 旧模块。
+#!name=国内常用 App 去广告 v3.1 · Xolny 定制
+#!desc=v3.1（2026-11-16）：新增腾讯视频贴片广告加强（广告决策域 adss/sdksp.video.qq.com + 优量汇素材域 gdtimg/ugdtimg 整域拦截，anti-AD 现行口径）。v3 内容：在 v2 全部内容之上，新增哔哩哔哩开屏+首页信息流广告过滤（自有脚本，源自 app2smile 已审读逻辑，fail-open）；闲鱼脚本升级 v2（信息流新版 bizType 标记+fail-open、商品页 mamaAD 推荐广告、购买流广告、广告曝光接口拦截，脚本匹配范围扩到脚本已实现的全部接口）；另补高德开屏、网易云音乐活动弹窗、夸克广告路径。脚本全部托管于自有 GitHub 且逐个审读过。MITM 仅限下列娱乐/内容类主机，不含微信、支付宝、银行及支付域名。
 #!update-interval=86400
+
+[Rule]
+# 腾讯视频贴片广告（决策域 + 优量汇素材域；域名级拦截免 MITM）
+DOMAIN-SUFFIX,adss.video.qq.com,REJECT
+DOMAIN-SUFFIX,sdksp.video.qq.com,REJECT
+DOMAIN-SUFFIX,gdtimg.com,REJECT
+DOMAIN-SUFFIX,ugdtimg.com,REJECT
 
 [URL Rewrite]
 # 优酷（贴片开关/广告接口/广告监测）

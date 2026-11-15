@@ -1,6 +1,12 @@
-#!name=爱奇艺去广告 v3 · Xolny 定制
-#!desc=接口拦截（开屏/广告信息）+ 脚本层删除首页焦点图、信息流、瀑布流、搜索页的广告卡片。MITM 仅解密爱奇艺的 4 组域名，其他 App 流量不碰。脚本与模块本体均托管于 GitHub（CuiAnce），从 URL 安装后可随仓库更新，不必再删了重装。
+#!name=爱奇艺去广告 v3.1 · Xolny 定制
+#!desc=v3.1（2026-11-16）：新增 Cupid 广告系统域名拦截（开屏/贴片/信息流广告的下发源）；脚本升级 v2（首页标记补齐、搜索改 strategy_com_id 口径、播放页关联广告）；覆盖 access.if.iqiyi.com 网关路径（此前首页数据走网关时脚本不触发，是顶部广告残留的主因）。接口拦截（开屏/广告信息）+ 脚本层删除首页焦点图、信息流、瀑布流、搜索页、播放页的广告卡片。MITM 仅解密爱奇艺的内容域名，其他 App 流量不碰。脚本与模块本体均托管于 GitHub（CuiAnce），从 URL 安装后可随仓库更新。
 #!update-interval=86400
+
+[Rule]
+# Cupid 广告系统（爱奇艺广告投放/决策域，含开屏与播放广告 mixer 接口）
+DOMAIN-SUFFIX,cupid.iqiyi.com,REJECT
+DOMAIN-SUFFIX,ad.m.iqiyi.com,REJECT
+DOMAIN-SUFFIX,afp.iqiyi.com,REJECT
 
 [URL Rewrite]
 # 广告信息接口（开屏/信息流广告的下发清单）
@@ -12,7 +18,7 @@
 ^https?:\/\/u\d\.iqiyipic\.com\/image\/[\w\/]+\/oad_ - reject
 
 [Script]
-iqiyi_strip = type=http-response, pattern=^https:\/\/cards\.iqiyi\.com\/(views_home\/3\.0\/qy_home|views_category\/3\.0\/category_home|waterfall(-plt)?\/3\.0\/feed|views_search\/3\.0\/hot_query_search)\?, requires-body=1, max-size=0, timeout=10, script-path=https://raw.githubusercontent.com/cui7878/CuiAnce/main/iqiyi-strip.js
+iqiyi_strip = type=http-response, pattern=^https:\/\/(?:cards\.iqiyi\.com|access\.if\.iqiyi\.com\/3f1\/cards\.iqiyi\.com)\/(views_home\/3\.0\/qy_home|views_category\/3\.0\/category_home|waterfall(-plt)?\/3\.0\/feed|views_search\/3\.0\/(hot_query_search|search)|views_plt\/3\.0\/player_tabs_v2)\?, requires-body=1, max-size=0, timeout=10, script-path=https://raw.githubusercontent.com/cui7878/CuiAnce/main/iqiyi-strip.js
 
 [MITM]
-hostname = %APPEND% iface.iqiyi.com, intl.iqiyi.com, *.iqiyipic.com, cards.iqiyi.com
+hostname = %APPEND% iface.iqiyi.com, intl.iqiyi.com, *.iqiyipic.com, cards.iqiyi.com, access.if.iqiyi.com
