@@ -1,0 +1,123 @@
+#!name=国内常用 App 去广告 v3 · Xolny 定制
+#!desc=v3（2026-11-16）：在 v2 全部内容之上，新增哔哩哔哩开屏+首页信息流广告过滤（自有脚本，源自 app2smile 已审读逻辑，fail-open）；闲鱼脚本升级 v2（信息流新版 bizType 标记+fail-open、商品页 mamaAD 推荐广告、购买流广告、广告曝光接口拦截，脚本匹配范围扩到脚本已实现的全部接口）；另补高德开屏、网易云音乐活动弹窗、夸克广告路径。脚本全部托管于自有 GitHub 且逐个审读过。MITM 仅限下列娱乐/内容类主机，不含微信、支付宝、银行及支付域名。导入前请先删除 v2 旧模块。
+#!update-interval=86400
+
+[URL Rewrite]
+# 优酷（贴片开关/广告接口/广告监测）
+^https?:\/\/ups\.youku\.com\/.*?needad=1& - reject
+^https?:\/\/ad\.api\.3g\.youku\.com - reject-img
+^https?:\/\/.+?\.atm\.youku\.com - reject
+^http:\/\/ems\.youku\.com\/imp\? - reject
+^https?:\/\/(iyes|(api|hd)\.mobile)\.youku\.com\/(adv|common\/v3\/hudong\/new) - reject-img
+# 芒果TV
+^https?:\/\/pcvideoyd\.titan\.mgtv\.com\/pb\/ - reject-img
+# 腾讯视频（广告决策/贴片片段/广告图）
+^https?:\/\/vv\.video\.qq\.com\/getvmind\? - reject-200
+^https?:\/\/video\.dispatch\.tc\.qq\.com\/\w+\.p20\d\.1\.mp4 - reject
+^https?:\/\/[\s\S]*\/.+?\.tc\.qq\.com\/.*?p201.1\.mp4 - reject-img
+^http:\/\/wa\.gtimg\.com\/adxcdn\/.+\.jpg - reject
+# B站（活动推广物料/浮窗）
+^https?:\/\/api\.bilibili\.com\/pgc\/activity\/deliver\/material\/receive - reject-dict
+^https?:\/\/app\.bilibili\.com\/x\/resource\/top\/activity - reject-dict
+# B站 v3 新增（开屏展示/弹幕广告/搜索默认词与搜索发现页推广，均为社区长年沿用的 reject-200 口径）
+^https?:\/\/(?:app\.bilibili\.com|app\.biliapi\.com)\/x\/v2\/splash\/show - reject-200
+^https?:\/\/api\.bilibili\.com\/x\/v2\/dm\/ad - reject-200
+^https?:\/\/(?:app\.bilibili\.com|app\.biliapi\.com)\/x\/v2\/search\/(?:defaultword|square) - reject-200
+# 闲鱼 v3 新增（广告曝光上报接口）
+^https?:\/\/(?:g-)?acs\.m\.goofish\.com\/gw\/mtop\.idle\.ad\.expose - reject-200
+# 高德 v3 新增（alimama 开屏）
+^https?:\/\/.*\.amap\.com\/ws\/aos\/alimama\/splash_screen - reject-200
+# 网易云音乐 v3 新增（首页活动弹窗模板）
+^https?:\/\/interface(\d)?\.music\.163\.com\/e?api\/content\/activity\/music\/jar\/template\/list - reject-200
+# 夸克 v3 新增（广告下发路径）
+^https?:\/\/unet\.quark\.cn\/v3\/ad\/ - reject
+# 拼多多（开屏）
+^https?:\/\/api\.(pinduoduo|yangkeduo)\.com\/api\/cappuccino\/splash - reject
+# 高德地图（开屏/增值广告位）
+^https?:\/\/m5\.amap\.com\/ws\/valueadded\/ - reject
+^https?:\/\/optimus-ads\.amap\.com\/uploadimg\/ - reject
+# 京东（开屏素材）
+^https?:\/\/api\.m\.jd\.com\/client\.action\?functionId=(start|queryMaterialAdverts) - reject
+# 百度地图（开屏广告）
+^https?:\/\/newclient\.map\.baidu\.com\/client\/phpui2\/\?qt=ads - reject
+# 网易新闻（广告位）
+^https?+:\/\/c\.m\.163\.com\/nc\/gl\/ - reject-200
+
+# ===== v2 新增 =====
+# 淘宝（开屏 mtop 接口）
+^https?:\/\/acs\.m\.taobao\.com\/gw\/mtop\.etao\.noah\.query\/.+tao_splash - reject
+# QQ音乐（开屏图素材路径）
+^https?:\/\/y\.gtimg\.cn\/music\/common\/upload\/t_splash_info\/ - reject
+# 知乎（横幅/品牌广告素材）
+^https?:\/\/www\.zhihu\.com\/commercial_api\/banners_v3\/mobile_banner - reject
+^https?:\/\/zhstatic\.zhihu\.com\/brand-ad - reject
+# 百度 App（百川开屏配置/联盟渲染/推广入口/DSP 开关页）
+^https?:\/\/baichuan\.baidu\.com\/rs\/adpmobile\/launch - reject
+^https?:\/\/mobads\.baidu\.com\/cpro\/ui\/mads.+ - reject
+^https?:\/\/afd\.baidu\.com\/afd\/entry - reject
+^https?:\/\/cover\.baidu\.com\/cover\/page\/dspSwitchAds\/ - reject
+# 豆瓣（广告系统素材路径）
+^https?:\/\/img\d\.doubanio\.com\/view\/dale-online\/dale_ad\/ - reject
+# 携程（广告交易像素）
+^https?:\/\/ma-adx\.ctrip\.com\/_ma\.gif - reject
+# 滴滴（活动预加载/多弹窗通知）
+^https?:\/\/res\.xiaojukeji\.com\/resapi\/activity\/get(Ruled|Preload|PasMultiNotices) - reject
+^https?:\/\/res\.xiaojukeji\.com\/resapi\/activity\/mget - reject
+# 饿了么（开屏素材，按竖版尺寸特征限定；若商家图片显示异常，先删本组 8 条）
+^https?:\/\/elemecdn\.com\/.+\/sitemap - reject
+^https?:\/\/fuss10\.elemecdn\.com\/.+\/w\/640\/h\/\d{3,4} - reject
+^https?:\/\/fuss10\.elemecdn\.com\/.+\/w\/750\/h\/\d{3,4} - reject
+^https?:\/\/cube\.elemecdn\.com\/[\w\/]+\.jpeg\?x-oss-process=image\/resize,m_fill,w_1\d{3},h_2\d{3}\/format,webp\/ - reject
+^https?:\/\/cube\.elemecdn\.com\/[\w\/]+\.jpeg\?x-oss-process=image\/resize,m_fill,w_6\d{2},h_8\d{2}\/format,webp\/ - reject
+^https?:\/\/cube\.elemecdn\.com\/[\w\/]+\.jpeg\?x-oss-process=image\/resize,m_fill,w_\d{3},h_\d{4}\/format,webp\/ - reject
+^https?:\/\/cube\.elemecdn\.com\/\w\/\w{2}\/\w+mp4\.mp4\? - reject
+^https?:\/\/(nr-op|cube)\.elemecdn\.com\/.+\.jpeg\?x-oss-process=image\/resize,m_fill,w_\d{4,},h_\d{4,}\/($|format,webp\/$) - reject
+# WPS（广告统计服务）
+^https?:\/\/ios\.wps\.cn\/ad-statistics-service - reject
+
+[Map Local]
+# 知乎（开屏 launch_v2/横幅/悬浮窗/弹窗/广告样式服务）
+^https?:\/\/api\.zhihu\.com\/commercial_api\/(?:answer\/\d+\/bottom-v2|article\/\d+\/bottom-v2|banners_v3\/app_topstory_banner|launch_v2|real_time_launch_v2) data-type=text data="{}" header="Content-Type:application/json"
+^https?:\/\/api\.zhihu\.com\/(?:bazaar\/float_window|market\/popovers_v2) data-type=text data="{}" header="Content-Type:application/json"
+^https?:\/\/api\.zhihu\.com\/ad-style-service\/request data-type=text data="{}" header="Content-Type:application/json"
+# 小红书（惊喜盒子弹窗/站内广告资源下发）
+^https?:\/\/edith\.(?:xiaohongshu|rnote)\.com\/api\/sns\/v1\/surprisebox\/(?:get_style|open|submit_action) data-type=text data="{}" header="Content-Type:application/json"
+^https?:\/\/www\.(?:xiaohongshu|rnote)\.com\/api\/sns\/(?:v\d+\/ads\/resource|v\d+\/hey\/\w+\/hey_gallery) data-type=text data="{}" header="Content-Type:application/json"
+# 闲鱼（开屏广告接口）
+^https?:\/\/acs\.m\.goofish\.com\/gw\/mtop\.taobao\.idlecommerce\.splash\.ads data-type=text data="{}" header="Content-Type:application/json"
+# 美团（外卖开屏三接口/首页喇叭弹窗/营销坑位）
+^https?:\/\/wmapi\.meituan\.com\/api\/v7\/(?:loadInfo|openscreen|startpicture)\? data-type=text data="{}" header="Content-Type:application/json"
+^https?:\/\/portal-portm\.meituan\.com\/horn_ios\/mergeRequest data-type=text data="{}" header="Content-Type:application/json"
+^https?:\/\/cdb\.meituan\.com\/marketing\/source\/getPageSlotList data-type=text data="{}" header="Content-Type:application/json"
+# 滴滴（广告系统配置口）
+^https?:\/\/as\.xiaojukeji\.com\/ep\/as\/conf\?ns=daijia-front&name= data-type=text data="{}" header="Content-Type:application/json"
+# 豆瓣（App 广告/通用广告位）
+^https?:\/\/api\.douban\.com\/v\d\/app_ads\/ data-type=text data="{}" header="Content-Type:application/json"
+^https?:\/\/api\.douban\.com\/b.*\/common_ads\?.* data-type=text data="{}" header="Content-Type:application/json"
+# 携程（开屏广告接口，soa2 广告专用服务号 13916）
+^https?:\/\/m\.ctrip\.com\/restapi\/soa2\/13916\/scjson\/tripAds data-type=text data="{}" header="Content-Type:application/json"
+# 菜鸟（广告下发主接口/联盟 flyad/首页与底栏营销位）
+^https?:\/\/cn-acs\.m\.cainiao\.com\/gw\/mtop\.cainiao\.guoguo\.nbnetflow\.ads\.(?:batch\.show\.v2|index)\.cn data-type=text data="{}" header="Content-Type:application/json"
+^https?:\/\/(?:cn-acs\.m\.cainiao\.com|guide-acs\.m\.taobao\.com)\/gw\/mtop\.cainiao\.adx\.flyad\.getad data-type=text data="{}" header="Content-Type:application/json"
+^https?:\/\/cn-acs\.m\.cainiao\.com\/gw\/mtop\.cainiao\.nbpresentation\.(?:homepage\.merge|tabbar\.marketing)\.get\.cn data-type=text data="{}" header="Content-Type:application/json"
+# 饿了么（触发式弹窗接口）
+^https?:\/\/waimai-guide\.ele\.me\/\w+\/mtop\.alsc\.eleme\.\w+\.trigger\.respond data-type=text data="{}" header="Content-Type:application/json"
+
+[Script]
+# 微博开屏（uve 广告拉取接口清空；脚本已审读，托管于自有 GitHub）
+wb_launch = type=http-response, requires-body=1, timeout=10, pattern=^https?:\/\/(?:sdk|wb)app\.uve\.weibo\.com(?:\/interface\/sdk\/sdkad\.php|\/wbapplua\/wbpullad\.lua), script-path=https://raw.githubusercontent.com/cui7878/CuiAnce/main/vendor/wb_launch.js
+# 微博信息流广告（过滤时间线广告条目；脚本已审读）
+wb_ad = type=http-response, requires-body=1, max-size=-1, timeout=10, pattern=^https?://m?api\.weibo\.c(n|om)/2/(statuses/(unread|extend|positives/get|(friends|video)(/|_)(mix)?timeline)|stories/(video_stream|home_list)|(groups|fangle)/timeline|profile/statuses|comments/build_comments|photo/recommend_list|service/picfeed|searchall|cardlist|page|!/(photos/pic_recommend_status|live/media_homelist)|video/tiny_stream_video_list|photo/info|remind/unread_count), script-path=https://raw.githubusercontent.com/cui7878/CuiAnce/main/vendor/wb_ad.js
+# 知乎信息流推广/浮层（脚本已审读）
+zhihu_strip = type=http-response, requires-body=1, timeout=10, pattern=^https?:\/\/api\.zhihu\.com\/(?:moments_v3|topstory\/recommend|topstory\/hot-lists\/total|commercial_api\/app_float_layer|feed\/render\/tab\/config), script-path=https://raw.githubusercontent.com/cui7878/CuiAnce/main/vendor/zhihu.js
+# 小红书开屏（自有脚本：删 splash 配置块 + 广告时间推到 2090 年）
+xhs_strip = type=http-response, requires-body=1, timeout=10, pattern=^https?:\/\/edith\.(?:xiaohongshu|rnote)\.com\/api\/sns\/v\d+\/system_service\/(?:splash_config|config), script-path=https://raw.githubusercontent.com/cui7878/CuiAnce/main/vendor/xhs-strip.js
+# 闲鱼信息流/商品页广告（脚本 v2 2026-11-16：信息流双标记+fail-open、详情页 mamaAD、购买流；匹配范围扩到脚本已实现的全部接口）
+goofish_strip = type=http-response, requires-body=1, timeout=10, pattern=^https:\/\/(?:g-)?acs\.m\.goofish\.com\/gw\/mtop\.taobao\.(?:idlehome\.home\.nextfresh|idle\.local\.home|idlehome\.home\.circle\.list|idlemtopsearch\.search|idlemtopsearch\.search\.shade|idle\.user\.strategy\.list|idle\.item\.recommend|idle\.item\.buy\.feeds|idle\.group\.myself\.banner|idle\.home\.whale\.modulet)\/, script-path=https://raw.githubusercontent.com/cui7878/CuiAnce/main/vendor/goofish.js
+# 哔哩哔哩开屏+首页信息流广告（自有脚本 bilibili-ad.js：源自 app2smile 已审读逻辑，fail-open；覆盖 app.bilibili.com 与 app.biliapi.com 双域名）
+bilibili_ad = type=http-response, requires-body=1, max-size=-1, timeout=10, pattern=^https?:\/\/(?:app\.bilibili\.com|app\.biliapi\.com)\/x\/v2\/(?:splash\/(?:list|show)|feed\/index), script-path=https://raw.githubusercontent.com/cui7878/CuiAnce/main/vendor/bilibili-ad.js
+# 贴吧开屏/信息流广告（脚本已审读）
+tieba_strip = type=http-response, requires-body=1, timeout=10, pattern=^https?:\/\/(?:tiebac|c\.tieba)\.baidu\.com\/(?:c\/f\/ad\/getSplashAd|c\/f\/excellent\/personalized|c\/f\/frs\/(?:generalTabList|page|threadlist)|c\/f\/pb\/page|c\/s\/sync|tiebaads\/commonbatch), script-path=https://raw.githubusercontent.com/cui7878/CuiAnce/main/vendor/tieba-json.js
+
+[MITM]
+hostname = %APPEND% ups.youku.com, ad.api.3g.youku.com, *.atm.youku.com, ems.youku.com, iyes.youku.com, api.mobile.youku.com, hd.mobile.youku.com, pcvideoyd.titan.mgtv.com, vv.video.qq.com, video.dispatch.tc.qq.com, *.tc.qq.com, wa.gtimg.com, api.pinduoduo.com, api.yangkeduo.com, m5.amap.com, optimus-ads.amap.com, *.amap.com, api.bilibili.com, app.bilibili.com, app.biliapi.com, api.m.jd.com, newclient.map.baidu.com, c.m.163.com, interface*.music.163.com, unet.quark.cn, api.weibo.cn, mapi.weibo.com, *.uve.weibo.com, api.zhihu.com, www.zhihu.com, edith.xiaohongshu.com, www.xiaohongshu.com, edith.rnote.com, www.rnote.com, acs.m.taobao.com, guide-acs.m.taobao.com, acs.m.goofish.com, g-acs.m.goofish.com, cn-acs.m.cainiao.com, wmapi.meituan.com, portal-portm.meituan.com, cdb.meituan.com, elemecdn.com, fuss10.elemecdn.com, cube.elemecdn.com, waimai-guide.ele.me, as.xiaojukeji.com, res.xiaojukeji.com, api.douban.com, tiebac.baidu.com, c.tieba.baidu.com, m.ctrip.com, ma-adx.ctrip.com, baichuan.baidu.com, afd.baidu.com, mobads.baidu.com, cover.baidu.com, ios.wps.cn, y.gtimg.cn

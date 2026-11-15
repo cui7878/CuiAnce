@@ -1,0 +1,18 @@
+#!name=爱奇艺去广告 v3 · Xolny 定制
+#!desc=接口拦截（开屏/广告信息）+ 脚本层删除首页焦点图、信息流、瀑布流、搜索页的广告卡片。MITM 仅解密爱奇艺的 4 组域名，其他 App 流量不碰。脚本与模块本体均托管于 GitHub（CuiAnce），从 URL 安装后可随仓库更新，不必再删了重装。
+#!update-interval=86400
+
+[URL Rewrite]
+# 广告信息接口（开屏/信息流广告的下发清单）
+^https?:\/\/iface\.iqiyi\.com\/api\/getNewAdInfo - reject
+# 国际版广告接口
+^https?:\/\/intl\.iqiyi\.com\/ad_external\/ - reject
+^https?:\/\/intl\.iqiyi\.com\/video\/advertise - reject
+# 开屏广告图（iqiyipic 上 oad_ 前缀的图片）
+^https?:\/\/u\d\.iqiyipic\.com\/image\/[\w\/]+\/oad_ - reject
+
+[Script]
+iqiyi_strip = type=http-response, pattern=^https:\/\/cards\.iqiyi\.com\/(views_home\/3\.0\/qy_home|views_category\/3\.0\/category_home|waterfall(-plt)?\/3\.0\/feed|views_search\/3\.0\/hot_query_search)\?, requires-body=1, max-size=0, timeout=10, script-path=https://raw.githubusercontent.com/cui7878/CuiAnce/main/iqiyi-strip.js
+
+[MITM]
+hostname = %APPEND% iface.iqiyi.com, intl.iqiyi.com, *.iqiyipic.com, cards.iqiyi.com
