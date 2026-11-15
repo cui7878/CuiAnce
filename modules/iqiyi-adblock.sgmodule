@@ -1,8 +1,11 @@
-#!name=爱奇艺去广告 v3.1 · Xolny 定制
-#!desc=v3.1（2026-11-16）：新增 Cupid 广告系统域名拦截（开屏/贴片/信息流广告的下发源）；脚本升级 v2（首页标记补齐、搜索改 strategy_com_id 口径、播放页关联广告）；覆盖 access.if.iqiyi.com 网关路径（此前首页数据走网关时脚本不触发，是顶部广告残留的主因）。接口拦截（开屏/广告信息）+ 脚本层删除首页焦点图、信息流、瀑布流、搜索页、播放页的广告卡片。MITM 仅解密爱奇艺的内容域名，其他 App 流量不碰。脚本与模块本体均托管于 GitHub（CuiAnce），从 URL 安装后可随仓库更新。
+#!name=爱奇艺去广告 v3.2 · Xolny 定制
+#!desc=v3.2（2026-11-16）：实验性新增 Puma 接口整域拦截——用户真机请求记录实锤：现行 App 首页已改道 puma-api.iqiyi.com，cards.iqiyi.com 零请求、旧脚本无从触发；217heidai 维护的 DNS 去广告清单同样整域拦 puma-api/puma.api，借此验证其是否为运营/广告下发通道。若首页打不开，删掉本模块 [Rule] 里 puma 两行即恢复。v3.1：新增 Cupid 广告系统域名拦截（开屏/贴片/信息流广告的下发源）；脚本升级 v2（首页标记补齐、搜索改 strategy_com_id 口径、播放页关联广告）；覆盖 access.if.iqiyi.com 网关路径。MITM 仅解密爱奇艺的内容域名，其他 App 流量不碰。脚本与模块本体均托管于 GitHub（CuiAnce），从 URL 安装后可随仓库更新。
 #!update-interval=86400
 
 [Rule]
+# Puma 接口（v3.2 实验：新版首页改道后的运营/广告下发通道嫌疑，整域拦截验证）
+DOMAIN,puma-api.iqiyi.com,REJECT
+DOMAIN,puma.api.iqiyi.com,REJECT
 # Cupid 广告系统（爱奇艺广告投放/决策域，含开屏与播放广告 mixer 接口）
 DOMAIN-SUFFIX,cupid.iqiyi.com,REJECT
 DOMAIN-SUFFIX,ad.m.iqiyi.com,REJECT
